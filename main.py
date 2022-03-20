@@ -1,6 +1,11 @@
 import requests
 import os
-from pathlib import Path
+
+
+def check_for_redirect(response):
+    if response.history:
+        raise requests.HTTPError
+
 
 directory_name = 'books'
 if not os.path.exists(directory_name):
@@ -14,6 +19,10 @@ for i in range(1, 11):
     response = requests.get(url, params=payload)
     response.raise_for_status()
 
-    filename = f'books/id{i}.txt'
-    with open(filename, 'wb') as file:
-        file.write(response.content)
+    try:
+        check_for_redirect(response)
+        filename = f'books/id{i}.txt'
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+    except requests.HTTPError:
+        print('Такой книги нет!')

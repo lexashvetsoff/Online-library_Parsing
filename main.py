@@ -2,6 +2,11 @@ import requests
 import os
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
+from urllib.parse import urljoin
+
+BASE_URL = 'https://tululu.org'
+BOOK_URL = 'https://tululu.org/b'
+DOWNLOAD_URL = 'https://tululu.org/txt.php'
 
 
 def check_for_redirect(response):
@@ -9,13 +14,26 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def get_book_title(id):
-    url = f'https://tululu.org/b{id}/'
-
+def get_soup_html(url):
     response = requests.get(url)
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.text, 'lxml')
+    return BeautifulSoup(response.text, 'lxml')
+
+
+def get_book_image(id):
+    url = f'{BOOK_URL}{id}/'
+
+    soup = get_soup_html(url)
+    if soup.find('div', class_='bookimage'):
+        book_image = soup.find('div', class_='bookimage').find('img')
+        return urljoin(BASE_URL, book_image['src'])
+
+
+def get_book_title(id):
+    url = f'{BOOK_URL}{id}/'
+
+    soup = get_soup_html(url)
     if soup.find('div', id='content'):
         book_title = soup.find('div', id='content').find('h1')
         text = book_title.text.split('::')
@@ -47,7 +65,6 @@ def download_txt(url, id, folder='books/'):
         print('Такой книги нет!')
 
 
-url = 'https://tululu.org/txt.php'
-
 for i in range(1, 11):
-    download_txt(url, i)
+    # download_txt(DOWNLOAD_URL, i)
+    print(get_book_image(i))

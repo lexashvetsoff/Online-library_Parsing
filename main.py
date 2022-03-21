@@ -9,15 +9,20 @@ BOOK_URL = 'https://tululu.org/b'
 DOWNLOAD_URL = 'https://tululu.org/txt.php'
 
 
+def send_request(url, payload={}):
+    response = requests.get(url, params=payload)
+    response.raise_for_status()
+
+    return response
+
+
 def check_for_redirect(response):
     if response.history:
         raise requests.HTTPError
 
 
 def get_soup_html(url):
-    response = requests.get(url)
-    response.raise_for_status()
-
+    response = send_request(url)
     return BeautifulSoup(response.text, 'lxml')
 
 
@@ -48,8 +53,7 @@ def download_txt(url, id, folder='books/'):
 
     payload = {"id": id}
 
-    response = requests.get(url, params=payload)
-    response.raise_for_status()
+    response = send_request(url, payload=payload)
 
     title = get_book_title(id)
 

@@ -1,8 +1,9 @@
+from urllib import response
 import requests
 import os
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 BASE_URL = 'https://tululu.org'
 BOOK_URL = 'https://tululu.org/b'
@@ -45,6 +46,30 @@ def get_book_title(id):
         return text[0].strip()
 
 
+def download_image(id, folder='images/'):
+    """Функция для скачивания картинок"""
+    if not os.path.exists(folder):
+        os.makedirs(folder, exist_ok=True)
+    
+    url = get_book_image(id)
+
+    if url:
+        response = send_request(url)
+
+        split_url = urlsplit(url)
+        valid_filename = sanitize_filename(split_url.path)
+        valid_folder = sanitize_filename(folder)
+
+        filepath = os.path.join(valid_folder, valid_filename)
+        try:
+            check_for_redirect(response)
+            filepath = os.path.join(valid_folder, valid_filename)
+            with open(filepath, 'wb') as file:
+                file.write(response.content)
+        except requests.HTTPError:
+            print('Такой книги нет!')
+
+
 def download_txt(url, id, folder='books/'):
     """Функция для скачивания текстовых файлов."""
 
@@ -52,7 +77,6 @@ def download_txt(url, id, folder='books/'):
         os.makedirs(folder, exist_ok=True)
 
     payload = {"id": id}
-
     response = send_request(url, payload=payload)
 
     title = get_book_title(id)
@@ -71,4 +95,5 @@ def download_txt(url, id, folder='books/'):
 
 for i in range(1, 11):
     # download_txt(DOWNLOAD_URL, i)
-    print(get_book_image(i))
+    download_image(i)
+# download_image(7)

@@ -27,6 +27,18 @@ def get_soup_html(url):
     return BeautifulSoup(response.text, 'lxml')
 
 
+def get_books_genre(id):
+    url = f'{BOOK_URL}{id}/'
+
+    soup = get_soup_html(url)
+    genres = []
+    if soup.find('span', class_='d_book'):
+        genres_html = soup.find('span', class_='d_book').find_all('a')
+        for genre in genres_html:
+            genres.append(genre.text)
+    return genres
+
+
 def get_book_comments(id):
     url = f'{BOOK_URL}{id}/'
 
@@ -36,7 +48,6 @@ def get_book_comments(id):
         comments_html = soup.find('div', id='content').find_all('span', class_='black')
         for comment in comments_html:
             comments.append(comment.text)
-
         return comments
 
 
@@ -109,4 +120,5 @@ def download_txt(url, id, folder='books/'):
 for i in range(1, 11):
     # download_txt(DOWNLOAD_URL, i)
     # download_image(i)
-    print(get_book_comments(i))
+    # print(get_book_comments(i))
+    print(get_books_genre(i))

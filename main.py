@@ -12,8 +12,8 @@ DOWNLOAD_URL = 'https://tululu.org/txt.php'
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s','--start_id', default=1, type=int)
-    parser.add_argument('-e','--end_id', default=10, type=int)
+    parser.add_argument('start_id', default=1, type=int)
+    parser.add_argument('end_id', default=10, type=int)
  
     return parser
 

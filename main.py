@@ -60,7 +60,7 @@ def get_book_comments(soup):
 
 def get_url_book_image(book_url, id):
     soup = get_soup_html(book_url, id)
-    if soup.find('div', class_='bookimage'):
+    if soup:
         book_image = soup.find('div', class_='bookimage').find('img')
         return urljoin(BASE_URL, book_image['src'])
 
@@ -92,18 +92,18 @@ def download_image(id, folder='images/'):
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
     
-    url = get_url_book_image(id)
+    url = get_url_book_image(BOOK_URL, id)
 
     if url:
-        response = send_request(url)
-
-        split_url = urlsplit(url)
-        valid_filename = sanitize_filename(split_url.path)
-        valid_folder = sanitize_filename(folder)
-
-        filepath = os.path.join(valid_folder, valid_filename)
         try:
+            response = send_request(url)
             check_for_redirect(response)
+
+            split_url = urlsplit(url)
+            valid_filename = sanitize_filename(split_url.path)
+            valid_folder = sanitize_filename(folder)
+
+            filepath = os.path.join(valid_folder, valid_filename)
             filepath = os.path.join(valid_folder, valid_filename)
             with open(filepath, 'wb') as file:
                 file.write(response.content)
@@ -120,13 +120,13 @@ def download_txt(url, id, folder='books/'):
     payload = {"id": id}
     response = send_request(url, payload=payload)
 
-    title = get_book_title(id)
-
-    valid_filename = f'{id}.{sanitize_filename(title)}.txt'
-    valid_folder = sanitize_filename(folder)
-
     try:
         check_for_redirect(response)
+        soup = get_soup_html(BOOK_URL, id)
+        title, author = get_book_title(soup)
+
+        valid_filename = f'{id}.{sanitize_filename(title)}.txt'
+        valid_folder = sanitize_filename(folder)
         filepath = os.path.join(valid_folder, valid_filename)
         with open(filepath, 'wb') as file:
             file.write(response.content)
@@ -138,6 +138,8 @@ def main():
     parser = create_parser()
     namespace = parser.parse_args()
     for i in range(namespace.start_id, namespace.end_id + 1):
+        download_txt(DOWNLOAD_URL, i)
+        download_image(i)
         soup = get_soup_html(BOOK_URL, i)
         print(i, parse_book_page(soup))
         print()

@@ -1,13 +1,21 @@
-from urllib import response
 import requests
 import os
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin, urlsplit
+import argparse
 
 BASE_URL = 'https://tululu.org'
 BOOK_URL = 'https://tululu.org/b'
 DOWNLOAD_URL = 'https://tululu.org/txt.php'
+
+
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s','--start_id', default=1, type=int)
+    parser.add_argument('-e','--end_id', default=10, type=int)
+ 
+    return parser
 
 
 def send_request(url, payload={}):
@@ -126,7 +134,14 @@ def download_txt(url, id, folder='books/'):
         print('Такой книги нет!')
 
 
-for i in range(1, 11):
-    soup = get_soup_html(BOOK_URL, i)
-    print(i, parse_book_page(soup))
-    print()
+def main():
+    parser = create_parser()
+    namespace = parser.parse_args()
+    for i in range(namespace.start_id, namespace.end_id + 1):
+        soup = get_soup_html(BOOK_URL, i)
+        print(i, parse_book_page(soup))
+        print()
+
+
+if __name__ == '__main__':
+    main()

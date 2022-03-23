@@ -14,7 +14,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('start_id', default=1, type=int)
     parser.add_argument('end_id', default=10, type=int)
- 
+
     return parser
 
 
@@ -91,7 +91,7 @@ def download_image(id, folder='images/'):
     """Функция для скачивания картинок"""
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
-    
+
     url = get_url_book_image(BOOK_URL, id)
 
     if url:

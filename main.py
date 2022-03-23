@@ -22,15 +22,17 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def get_soup_html(url):
-    response = send_request(url)
-    return BeautifulSoup(response.text, 'lxml')
+def get_soup_html(book_url, id):
+    requests_url = f'{book_url}{id}/'
+    response = send_request(requests_url)
+    try:
+        check_for_redirect(response)
+        return BeautifulSoup(response.text, 'lxml')
+    except requests.HTTPError:
+            print('Такой книги нет!')
 
 
-def get_books_genre(id):
-    url = f'{BOOK_URL}{id}/'
-
-    soup = get_soup_html(url)
+def get_books_genre(soup):
     genres = []
     if soup.find('span', class_='d_book'):
         genres_html = soup.find('span', class_='d_book').find_all('a')
@@ -39,10 +41,7 @@ def get_books_genre(id):
     return genres
 
 
-def get_book_comments(id):
-    url = f'{BOOK_URL}{id}/'
-
-    soup = get_soup_html(url)
+def get_book_comments(soup):
     comments = []
     if soup.find('div', id='content'):
         comments_html = soup.find('div', id='content').find_all('span', class_='black')
@@ -51,23 +50,33 @@ def get_book_comments(id):
         return comments
 
 
-def get_url_book_image(id):
-    url = f'{BOOK_URL}{id}/'
-
-    soup = get_soup_html(url)
+def get_url_book_image(book_url, id):
+    soup = get_soup_html(book_url, id)
     if soup.find('div', class_='bookimage'):
         book_image = soup.find('div', class_='bookimage').find('img')
         return urljoin(BASE_URL, book_image['src'])
 
 
-def get_book_title(id):
-    url = f'{BOOK_URL}{id}/'
-
-    soup = get_soup_html(url)
-    if soup.find('div', id='content'):
+def get_book_title(soup):
+    if soup:
         book_title = soup.find('div', id='content').find('h1')
         text = book_title.text.split('::')
-        return text[0].strip()
+        return text[0].strip(), text[1].strip()
+
+
+def parse_book_page(soup):
+    if soup:
+        title, author = get_book_title(soup)
+        genre = get_books_genre(soup)
+        comments = get_book_comments(soup)
+
+        parse_page = {
+            'Название': title,
+            'Автор': author,
+            'Жанр': genre,
+            'Коментарии': comments,
+        }
+        return parse_page
 
 
 def download_image(id, folder='images/'):
@@ -118,7 +127,6 @@ def download_txt(url, id, folder='books/'):
 
 
 for i in range(1, 11):
-    # download_txt(DOWNLOAD_URL, i)
-    # download_image(i)
-    # print(get_book_comments(i))
-    print(get_books_genre(i))
+    soup = get_soup_html(BOOK_URL, i)
+    print(i, parse_book_page(soup))
+    print()

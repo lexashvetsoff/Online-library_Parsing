@@ -23,84 +23,62 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def get_soup_html(book_url, book_id):
+def parse_book_page(book_url, book_id):
     requests_url = f'{book_url}{book_id}/'
     response = requests.get(requests_url)
     response.raise_for_status()
     check_for_redirect(response)
-    return BeautifulSoup(response.text, 'lxml')
-
-
-def get_books_genre(soup):
-    genres = []
-    if soup.find('span', class_='d_book'):
-        genres_html = soup.find('span', class_='d_book').find_all('a')
-        for genre in genres_html:
-            genres.append(genre.text)
-    return genres
-
-
-def get_book_comments(soup):
-    comments = []
-    if soup.find('div', id='content'):
-        comments_html = soup.find('div', id='content').find_all('span', class_='black')
-        for comment in comments_html:
-            comments.append(comment.text)
-        return comments
-
-
-def get_url_book_image(book_url, book_id):
-    soup = get_soup_html(book_url, book_id)
-    if soup:
-        book_image = soup.find('div', class_='bookimage').find('img')
-        return urljoin(BASE_URL, book_image['src'])
-
-
-def get_book_title(soup):
+    soup = BeautifulSoup(response.text, 'lxml')
     if soup:
         book_title = soup.find('div', id='content').find('h1')
         text = book_title.text.split('::')
-        return text[0].strip(), text[1].strip()
+        title, author = text[0].strip(), text[1].strip()
 
+        genres = []
+        if soup.find('span', class_='d_book'):
+            genres_html = soup.find('span', class_='d_book').find_all('a')
+            for genre in genres_html:
+                genres.append(genre.text)
 
-def parse_book_page(soup):
-    if soup:
-        title, author = get_book_title(soup)
-        genre = get_books_genre(soup)
-        comments = get_book_comments(soup)
+        comments = []
+        if soup.find('div', id='content'):
+            comments_html = soup.find('div', id='content').find_all('span', class_='black')
+            for comment in comments_html:
+                comments.append(comment.text)
+
+        book_image = soup.find('div', class_='bookimage').find('img')
+        image_url = urljoin(BASE_URL, book_image['src'])
 
         parse_page = {
             'Название': title,
             'Автор': author,
-            'Жанр': genre,
+            'Жанр': genres,
             'Коментарии': comments,
+            'image_url': image_url
         }
         return parse_page
 
 
-def download_image(book_id, folder='images/'):
+def download_image(image_url, folder='images/'):
     """Функция для скачивания картинок"""
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
-    url = get_url_book_image(BOOK_URL, book_id)
+    response = requests.get(image_url)
+    response.raise_for_status()
+    check_for_redirect(response)
 
-    if url:
-        response = requests.get(url)
-        response.raise_for_status()
-        check_for_redirect(response)
+    split_url = urlsplit(image_url)
+    valid_filename = sanitize_filename(split_url.path)
+    valid_folder = sanitize_filename(folder)
 
-        split_url = urlsplit(url)
-        valid_filename = sanitize_filename(split_url.path)
-        valid_folder = sanitize_filename(folder)
-
-        filepath = os.path.join(valid_folder, valid_filename)
-        filepath = os.path.join(valid_folder, valid_filename)
-        with open(filepath, 'wb') as file:
-            file.write(response.content)
+    filepath = os.path.join(valid_folder, valid_filename)
+    filepath = os.path.join(valid_folder, valid_filename)
+    with open(filepath, 'wb') as file:
+        file.write(response.content)
 
 
-def download_txt(url, book_id, folder='books/'):
+def download_txt(url, book_id, title, folder='books/'):
     """Функция для скачивания текстовых файлов."""
 
     if not os.path.exists(folder):
@@ -111,14 +89,13 @@ def download_txt(url, book_id, folder='books/'):
     response.raise_for_status()
 
     check_for_redirect(response)
-    soup = get_soup_html(BOOK_URL, book_id)
-    title, author = get_book_title(soup)
 
     valid_filename = f'{book_id}.{sanitize_filename(title)}.txt'
     valid_folder = sanitize_filename(folder)
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'wb') as file:
-        file.write(response.text)
+        # при использовании response.text выпадает ошибка - TypeError: a bytes-like object is required, not 'str'
+        file.write(response.content)
 
 
 def main():
@@ -126,10 +103,10 @@ def main():
     starting_param = parser.parse_args()
     for book_id in range(starting_param.start_id, starting_param.end_id + 1):
         try:
-            download_txt(DOWNLOAD_URL, book_id)
-            download_image(book_id)
-            soup = get_soup_html(BOOK_URL, book_id)
-            print(book_id, parse_book_page(soup))
+            parse_page = parse_book_page(BOOK_URL, book_id)
+            download_txt(DOWNLOAD_URL, book_id, parse_page['Название'])
+            download_image(parse_page['image_url'])
+            print(book_id, parse_page)
             print()
         except requests.HTTPError:
             print('Такой книги нет!')

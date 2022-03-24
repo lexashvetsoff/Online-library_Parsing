@@ -137,11 +137,11 @@ def download_txt(url, id, folder='books/'):
 def main():
     parser = create_parser()
     args = parser.parse_args()
-    for i in range(args.start_id, args.end_id + 1):
-        download_txt(DOWNLOAD_URL, i)
-        download_image(i)
-        soup = get_soup_html(BOOK_URL, i)
-        print(i, parse_book_page(soup))
+    for page_book in range(args.start_id, args.end_id + 1):
+        download_txt(DOWNLOAD_URL, page_book)
+        download_image(page_book)
+        soup = get_soup_html(BOOK_URL, page_book)
+        print(page_book, parse_book_page(soup))
         print()
 
 

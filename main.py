@@ -136,8 +136,8 @@ def download_txt(url, id, folder='books/'):
 
 def main():
     parser = create_parser()
-    namespace = parser.parse_args()
-    for i in range(namespace.start_id, namespace.end_id + 1):
+    args = parser.parse_args()
+    for i in range(args.start_id, args.end_id + 1):
         download_txt(DOWNLOAD_URL, i)
         download_image(i)
         soup = get_soup_html(BOOK_URL, i)

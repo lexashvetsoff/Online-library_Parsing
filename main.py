@@ -18,13 +18,6 @@ def create_parser():
     return parser
 
 
-def send_request(url, payload={}):
-    response = requests.get(url, params=payload)
-    response.raise_for_status()
-
-    return response
-
-
 def check_for_redirect(response):
     if response.history:
         raise requests.HTTPError
@@ -32,7 +25,8 @@ def check_for_redirect(response):
 
 def get_soup_html(book_url, id):
     requests_url = f'{book_url}{id}/'
-    response = send_request(requests_url)
+    response = requests.get(requests_url)
+    response.raise_for_status()
     try:
         check_for_redirect(response)
         return BeautifulSoup(response.text, 'lxml')
@@ -96,7 +90,8 @@ def download_image(id, folder='images/'):
 
     if url:
         try:
-            response = send_request(url)
+            response = requests.get(url)
+            response.raise_for_status()
             check_for_redirect(response)
 
             split_url = urlsplit(url)
@@ -118,7 +113,8 @@ def download_txt(url, id, folder='books/'):
         os.makedirs(folder, exist_ok=True)
 
     payload = {"id": id}
-    response = send_request(url, payload=payload)
+    response = requests.get(url, params=payload)
+    response.raise_for_status()
 
     try:
         check_for_redirect(response)

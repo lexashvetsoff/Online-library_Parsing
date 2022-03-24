@@ -23,8 +23,8 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def get_soup_html(book_url, id):
-    requests_url = f'{book_url}{id}/'
+def get_soup_html(book_url, book_id):
+    requests_url = f'{book_url}{book_id}/'
     response = requests.get(requests_url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -49,8 +49,8 @@ def get_book_comments(soup):
         return comments
 
 
-def get_url_book_image(book_url, id):
-    soup = get_soup_html(book_url, id)
+def get_url_book_image(book_url, book_id):
+    soup = get_soup_html(book_url, book_id)
     if soup:
         book_image = soup.find('div', class_='bookimage').find('img')
         return urljoin(BASE_URL, book_image['src'])
@@ -78,12 +78,12 @@ def parse_book_page(soup):
         return parse_page
 
 
-def download_image(id, folder='images/'):
+def download_image(book_id, folder='images/'):
     """Функция для скачивания картинок"""
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
-    url = get_url_book_image(BOOK_URL, id)
+    url = get_url_book_image(BOOK_URL, book_id)
 
     if url:
         response = requests.get(url)
@@ -100,21 +100,21 @@ def download_image(id, folder='images/'):
             file.write(response.content)
 
 
-def download_txt(url, id, folder='books/'):
+def download_txt(url, book_id, folder='books/'):
     """Функция для скачивания текстовых файлов."""
 
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
-    payload = {"id": id}
+    payload = {"id": book_id}
     response = requests.get(url, params=payload)
     response.raise_for_status()
 
     check_for_redirect(response)
-    soup = get_soup_html(BOOK_URL, id)
+    soup = get_soup_html(BOOK_URL, book_id)
     title, author = get_book_title(soup)
 
-    valid_filename = f'{id}.{sanitize_filename(title)}.txt'
+    valid_filename = f'{book_id}.{sanitize_filename(title)}.txt'
     valid_folder = sanitize_filename(folder)
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'wb') as file:
@@ -124,12 +124,12 @@ def download_txt(url, id, folder='books/'):
 def main():
     parser = create_parser()
     starting_param = parser.parse_args()
-    for page_book in range(starting_param.start_id, starting_param.end_id + 1):
+    for book_id in range(starting_param.start_id, starting_param.end_id + 1):
         try:
-            download_txt(DOWNLOAD_URL, page_book)
-            download_image(page_book)
-            soup = get_soup_html(BOOK_URL, page_book)
-            print(page_book, parse_book_page(soup))
+            download_txt(DOWNLOAD_URL, book_id)
+            download_image(book_id)
+            soup = get_soup_html(BOOK_URL, book_id)
+            print(book_id, parse_book_page(soup))
             print()
         except requests.HTTPError:
             print('Такой книги нет!')

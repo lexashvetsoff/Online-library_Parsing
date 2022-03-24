@@ -118,7 +118,7 @@ def download_txt(url, book_id, folder='books/'):
     valid_folder = sanitize_filename(folder)
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'wb') as file:
-        file.write(response.content)
+        file.write(response.text)
 
 
 def main():

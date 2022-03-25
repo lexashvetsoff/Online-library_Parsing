@@ -100,8 +100,8 @@ def download_txt(url, book_id, title, folder='books/'):
 
 def main():
     parser = create_parser()
-    starting_param = parser.parse_args()
-    for book_id in range(starting_param.start_id, starting_param.end_id + 1):
+    args = parser.parse_args()
+    for book_id in range(args.start_id, args.end_id + 1):
         try:
             parse_page = parse_book_page(BOOK_URL, book_id)
             download_txt(DOWNLOAD_URL, book_id, parse_page['Название'])

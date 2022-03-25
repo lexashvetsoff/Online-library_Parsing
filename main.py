@@ -43,14 +43,14 @@ def parse_book_page(book_url, book_id):
     book_image = soup.find('div', class_='bookimage').find('img')
     image_url = urljoin(BASE_URL, book_image['src'])
 
-    parse_page = {
+    data_page = {
         'Название': title,
         'Автор': author,
         'Жанр': genres,
         'Коментарии': comments,
         'image_url': image_url
     }
-    return parse_page
+    return data_page
 
 
 def download_image(image_url, folder='images/'):
@@ -96,10 +96,10 @@ def main():
     args = parser.parse_args()
     for book_id in range(args.start_id, args.end_id + 1):
         try:
-            parse_page = parse_book_page(BOOK_URL, book_id)
-            download_txt(DOWNLOAD_URL, book_id, parse_page['Название'])
-            download_image(parse_page['image_url'])
-            print(book_id, parse_page)
+            data_page = parse_book_page(BOOK_URL, book_id)
+            download_txt(DOWNLOAD_URL, book_id, data_page['Название'])
+            download_image(data_page['image_url'])
+            print(book_id, data_page)
             print()
         except requests.HTTPError:
             print('Такой книги нет!')

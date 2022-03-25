@@ -34,15 +34,11 @@ def parse_book_page(book_url, book_id):
     text = book_title.text.split('::')
     title, author = text[0].strip(), text[1].strip()
 
-    genres = []
     genres_html = soup.find('span', class_='d_book').find_all('a')
-    for genre in genres_html:
-        genres.append(genre.text)
+    genres = [genre.text for genre in genres_html]
 
-    comments = []
     comments_html = soup.find('div', id='content').find_all('span', class_='black')
-    for comment in comments_html:
-        comments.append(comment.text)
+    comments = [comment.text for comment in comments_html]
 
     book_image = soup.find('div', class_='bookimage').find('img')
     image_url = urljoin(BASE_URL, book_image['src'])
@@ -92,7 +88,6 @@ def download_txt(url, book_id, title, folder='books/'):
     valid_folder = sanitize_filename(folder)
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'w') as file:
-        # при использовании response.text выпадает ошибка - TypeError: a bytes-like object is required, not 'str'
         file.write(response.text)
 
 

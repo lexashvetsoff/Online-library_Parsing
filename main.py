@@ -29,34 +29,32 @@ def parse_book_page(book_url, book_id):
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
-    if soup:
-        book_title = soup.find('div', id='content').find('h1')
-        text = book_title.text.split('::')
-        title, author = text[0].strip(), text[1].strip()
+    
+    book_title = soup.find('div', id='content').find('h1')
+    text = book_title.text.split('::')
+    title, author = text[0].strip(), text[1].strip()
 
-        genres = []
-        if soup.find('span', class_='d_book'):
-            genres_html = soup.find('span', class_='d_book').find_all('a')
-            for genre in genres_html:
-                genres.append(genre.text)
+    genres = []
+    genres_html = soup.find('span', class_='d_book').find_all('a')
+    for genre in genres_html:
+        genres.append(genre.text)
 
-        comments = []
-        if soup.find('div', id='content'):
-            comments_html = soup.find('div', id='content').find_all('span', class_='black')
-            for comment in comments_html:
-                comments.append(comment.text)
+    comments = []
+    comments_html = soup.find('div', id='content').find_all('span', class_='black')
+    for comment in comments_html:
+        comments.append(comment.text)
 
-        book_image = soup.find('div', class_='bookimage').find('img')
-        image_url = urljoin(BASE_URL, book_image['src'])
+    book_image = soup.find('div', class_='bookimage').find('img')
+    image_url = urljoin(BASE_URL, book_image['src'])
 
-        parse_page = {
-            'Название': title,
-            'Автор': author,
-            'Жанр': genres,
-            'Коментарии': comments,
-            'image_url': image_url
-        }
-        return parse_page
+    parse_page = {
+        'Название': title,
+        'Автор': author,
+        'Жанр': genres,
+        'Коментарии': comments,
+        'image_url': image_url
+    }
+    return parse_page
 
 
 def download_image(image_url, folder='images/'):

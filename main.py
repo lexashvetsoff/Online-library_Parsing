@@ -34,11 +34,11 @@ def parse_book_page(book_url, book_id):
     text = book_title.text.split('::')
     title, author = text[0].strip(), text[1].strip()
 
-    genres_html = soup.find('span', class_='d_book').find_all('a')
-    genres = [genre.text for genre in genres_html]
+    genres_obj = soup.find('span', class_='d_book').find_all('a')
+    genres = [genre.text for genre in genres_obj]
 
-    comments_html = soup.find('div', id='content').find_all('span', class_='black')
-    comments = [comment.text for comment in comments_html]
+    comments_obj = soup.find('div', id='content').find_all('span', class_='black')
+    comments = [comment.text for comment in comments_obj]
 
     book_image = soup.find('div', class_='bookimage').find('img')
     image_url = urljoin(BASE_URL, book_image['src'])

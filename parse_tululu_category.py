@@ -20,8 +20,6 @@ def get_book_id(url):
 
 
 def parse_book_urls():
-    books_url = []
-
     for page in range(1, 5):
         url = f'{PARSE_URL}{page}/'
         response = requests.get(url)
@@ -29,9 +27,10 @@ def parse_book_urls():
 
         soup = BeautifulSoup(response.text, 'lxml')
 
-        book_objects = soup.find_all('table', class_='d_book')
-        for book_obj in book_objects:
-            books_url.append(urljoin(BASE_URL, book_obj.find('a')['href']))
+        book_selector = 'table.d_book'
+        href_selector = 'a'
+        book_objects = soup.select(book_selector)
+        books_url = [urljoin(BASE_URL, book_obj.select_one(href_selector)['href']) for book_obj in book_objects]
 
     return books_url
 
@@ -84,17 +83,21 @@ def parse_book_page(book_url):
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
     
-    book_title = soup.find('div', id='content').find('h1')
+    title_selector = '#content h1'
+    book_title = soup.select_one(title_selector)
     text = book_title.text.split('::')
     title, author = text[0].strip(), text[1].strip()
 
-    genres_obj = soup.find('span', class_='d_book').find_all('a')
+    genres_selector = 'span.d_book a'
+    genres_obj = soup.select(genres_selector)
     genres = [genre.text for genre in genres_obj]
 
-    comments_obj = soup.find('div', id='content').find_all('span', class_='black')
+    comments_selector = '#content span.black'
+    comments_obj = soup.select(comments_selector)
     comments = [comment.text for comment in comments_obj]
 
-    book_image = soup.find('div', class_='bookimage').find('img')
+    img_selector = '.bookimage img'
+    book_image = soup.select_one(img_selector)
     image_url = urljoin(BASE_URL, book_image['src'])
 
     img_src = download_image(image_url)

@@ -67,7 +67,7 @@ def download_image(image_url, folder='images/'):
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'wb') as file:
         file.write(response.content)
-    
+
     return filepath
 
 
@@ -89,16 +89,21 @@ def download_txt(url, book_id, title, folder='books/'):
     filepath = os.path.join(valid_folder, valid_filename)
     with open(filepath, 'w', encoding='utf-8') as file:
         file.write(response.text)
-    
+
     return filepath
 
 
-def parse_book_page(book_url, dest_folder_img, dest_folder_txt, skip_imgs, skip_txt):
+def parse_book_page(
+        book_url,
+        dest_folder_img,
+        dest_folder_txt,
+        skip_imgs,
+        skip_txt):
     response = requests.get(book_url)
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
-    
+
     title_selector = '#content h1'
     book_title = soup.select_one(title_selector)
     text = book_title.text.split('::')
@@ -116,10 +121,8 @@ def parse_book_page(book_url, dest_folder_img, dest_folder_txt, skip_imgs, skip_
     book_image = soup.select_one(img_selector)
     image_url = urljoin(BASE_URL, book_image['src'])
 
-    # img_src = download_image(image_url, folder=dest_folder_img)
     img_src = 'Не скачивалась' if skip_imgs else download_image(image_url, folder=dest_folder_img)
 
-    # book_path = download_txt(DOWNLOAD_URL, get_book_id(book_url), title, folder=dest_folder_txt)
     book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, get_book_id(book_url), title, folder=dest_folder_txt)
 
     data_page = {
@@ -155,7 +158,7 @@ def main():
         except requests.HTTPError:
             print('Такой книги нет!')
         i += 1
-    
+
     with open(args.json_path, 'w', encoding='utf8') as file:
         json.dump(data_books, file, ensure_ascii=False)
 

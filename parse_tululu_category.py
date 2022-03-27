@@ -15,6 +15,11 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--start_page', default=1, type=int)
     parser.add_argument('--end_page', default=4, type=int)
+    parser.add_argument('--dest_folder_img', default='images/', type=str)
+    parser.add_argument('--dest_folder_txt', default='books/', type=str)
+    parser.add_argument('--skip_imgs', default=False, type=bool)
+    parser.add_argument('--skip_txt', default=False, type=bool)
+    parser.add_argument('--json_path', default='data_books.json', type=str)
 
     return parser
 
@@ -88,7 +93,7 @@ def download_txt(url, book_id, title, folder='books/'):
     return filepath
 
 
-def parse_book_page(book_url):
+def parse_book_page(book_url, dest_folder_img, dest_folder_txt, skip_imgs, skip_txt):
     response = requests.get(book_url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -111,8 +116,11 @@ def parse_book_page(book_url):
     book_image = soup.select_one(img_selector)
     image_url = urljoin(BASE_URL, book_image['src'])
 
-    img_src = download_image(image_url)
-    book_path = download_txt(DOWNLOAD_URL, get_book_id(book_url), title)
+    # img_src = download_image(image_url, folder=dest_folder_img)
+    img_src = 'Не скачивалась' if skip_imgs else download_image(image_url, folder=dest_folder_img)
+
+    # book_path = download_txt(DOWNLOAD_URL, get_book_id(book_url), title, folder=dest_folder_txt)
+    book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, get_book_id(book_url), title, folder=dest_folder_txt)
 
     data_page = {
         'Название': title,
@@ -137,12 +145,18 @@ def main():
     for book_url in book_urls:
         print(i)
         try:
-            data_books.append(parse_book_page(book_url))
+            data_books.append(parse_book_page(
+                                    book_url,
+                                    args.dest_folder_img,
+                                    args.dest_folder_txt,
+                                    args.skip_imgs,
+                                    args.skip_txt
+                                ))
         except requests.HTTPError:
             print('Такой книги нет!')
         i += 1
     
-    with open("data_books.json", "w", encoding='utf8') as file:
+    with open(args.json_path, 'w', encoding='utf8') as file:
         json.dump(data_books, file, ensure_ascii=False)
 
 

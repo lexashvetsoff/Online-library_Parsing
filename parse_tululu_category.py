@@ -13,13 +13,13 @@ DOWNLOAD_URL = 'https://tululu.org/txt.php'
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--start_page', default=1, type=int)
-    parser.add_argument('--end_page', default=4, type=int)
-    parser.add_argument('--dest_folder_img', default='images/', type=str)
-    parser.add_argument('--dest_folder_txt', default='books/', type=str)
-    parser.add_argument('--skip_imgs', default=False, type=bool)
-    parser.add_argument('--skip_txt', default=False, type=bool)
-    parser.add_argument('--json_path', default='data_books.json', type=str)
+    parser.add_argument('--start_page', default=1, type=int)  
+    parser.add_argument('--end_page', default=4, type=int)  
+    parser.add_argument('--dest_folder_img', default='images/', type=str)  
+    parser.add_argument('--dest_folder_txt', default='books/', type=str)  
+    parser.add_argument('--skip_imgs', default=False, type=bool)  
+    parser.add_argument('--skip_txt', default=False, type=bool)  
+    parser.add_argument('--json_path', default='data_books.json', type=str)  
 
     return parser
 

@@ -4,10 +4,19 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin, urlsplit
 import json
+import argparse
 
 BASE_URL = 'https://tululu.org'
 PARSE_URL = 'https://tululu.org/l55/'
 DOWNLOAD_URL = 'https://tululu.org/txt.php'
+
+
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--start_page', default=1, type=int)
+    parser.add_argument('--end_page', default=4, type=int)
+
+    return parser
 
 
 def check_for_redirect(response):
@@ -19,8 +28,9 @@ def get_book_id(url):
     return sanitize_filename(urlsplit(url).path)[1:]
 
 
-def parse_book_urls():
-    for page in range(1, 5):
+def parse_book_urls(start_page, end_page):
+    books_url = []
+    for page in range(start_page, end_page + 1):
         url = f'{PARSE_URL}{page}/'
         response = requests.get(url)
         response.raise_for_status()
@@ -28,9 +38,10 @@ def parse_book_urls():
         soup = BeautifulSoup(response.text, 'lxml')
 
         book_selector = 'table.d_book'
-        href_selector = 'a'
         book_objects = soup.select(book_selector)
-        books_url = [urljoin(BASE_URL, book_obj.select_one(href_selector)['href']) for book_obj in book_objects]
+        for book_obj in book_objects:
+            link_selector = 'a'
+            books_url.append(urljoin(BASE_URL, book_obj.select_one(link_selector)['href']))
 
     return books_url
 
@@ -116,8 +127,11 @@ def parse_book_page(book_url):
 
 
 def main():
+    parser = create_parser()
+    args = parser.parse_args()
+
     data_books = []
-    book_urls = parse_book_urls()
+    book_urls = parse_book_urls(args.start_page, args.end_page)
 
     i = 1
     for book_url in book_urls:

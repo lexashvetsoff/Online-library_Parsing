@@ -11,10 +11,21 @@ PARSE_URL = 'https://tululu.org/l55/'
 DOWNLOAD_URL = 'https://tululu.org/txt.php'
 
 
+def get_last_page(url):
+    response = requests.get(url)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, 'lxml')
+    page_selector = 'p.center a.npage'
+    link_pages = soup.select(page_selector)
+    last_link = link_pages.pop()
+    return int(last_link.text)
+
+
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--start_page', default=1, type=int)
-    parser.add_argument('--end_page', default=4, type=int)
+    parser.add_argument('--end_page', default=get_last_page(PARSE_URL), type=int)
     parser.add_argument('--dest_folder_img', default='images/', type=str)
     parser.add_argument('--dest_folder_txt', default='books/', type=str)
     parser.add_argument('--skip_imgs', default=False, type=bool)
@@ -131,7 +142,6 @@ def main():
 
     for book_url in book_urls:
         try:
-            # data_books.append(parse_book_page(book_url))
             data = parse_book_page(book_url)
 
             data['img_src'] = 'Не скачивалась' if args.skip_imgs else download_image(data['image_url'], folder=args.dest_folder_img)

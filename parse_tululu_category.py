@@ -103,7 +103,7 @@ def parse_book_page(
     title_selector = '#content h1'
     book_title = soup.select_one(title_selector)
     text = book_title.text.split('::')
-    title, author = text[0].strip(), text[1].strip()
+    title, author = text
 
     genres_selector = 'span.d_book a'
     genres_obj = soup.select(genres_selector)
@@ -123,8 +123,8 @@ def parse_book_page(
     book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, book_id, title, folder=dest_folder_txt)
 
     data_page = {
-        'Название': title,
-        'Автор': author,
+        'Название': title.strip(),
+        'Автор': author.strip(),
         'img_src': img_src,
         'book_path': book_path,
         'Жанр': genres,

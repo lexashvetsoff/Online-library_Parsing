@@ -144,9 +144,7 @@ def main():
     data_books = []
     book_urls = parse_book_urls(args.start_page, args.end_page)
 
-    i = 1
     for book_url in book_urls:
-        print(i)
         try:
             data_books.append(parse_book_page(
                                     book_url,
@@ -157,7 +155,6 @@ def main():
                                 ))
         except requests.HTTPError:
             print('Такой книги нет!')
-        i += 1
 
     with open(args.json_path, 'w', encoding='utf8') as file:
         json.dump(data_books, file, ensure_ascii=False)

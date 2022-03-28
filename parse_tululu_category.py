@@ -89,12 +89,7 @@ def download_txt(url, book_id, title, folder='books/'):
     return filepath
 
 
-def parse_book_page(
-        book_url,
-        dest_folder_img,
-        dest_folder_txt,
-        skip_imgs,
-        skip_txt):
+def parse_book_page(book_url):
     response = requests.get(book_url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -117,16 +112,9 @@ def parse_book_page(
     book_image = soup.select_one(img_selector)
     image_url = urljoin(BASE_URL, book_image['src'])
 
-    img_src = 'Не скачивалась' if skip_imgs else download_image(image_url, folder=dest_folder_img)
-
-    book_id = sanitize_filename(urlsplit(book_url).path)[1:]
-    book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, book_id, title, folder=dest_folder_txt)
-
     data_page = {
         'Название': title.strip(),
         'Автор': author.strip(),
-        'img_src': img_src,
-        'book_path': book_path,
         'Жанр': genres,
         'Коментарии': comments,
         'image_url': image_url
@@ -143,13 +131,14 @@ def main():
 
     for book_url in book_urls:
         try:
-            data_books.append(parse_book_page(
-                                    book_url,
-                                    args.dest_folder_img,
-                                    args.dest_folder_txt,
-                                    args.skip_imgs,
-                                    args.skip_txt
-                                ))
+            # data_books.append(parse_book_page(book_url))
+            data = parse_book_page(book_url)
+
+            data['img_src'] = 'Не скачивалась' if args.skip_imgs else download_image(data['image_url'], folder=args.dest_folder_img)
+            book_id = sanitize_filename(urlsplit(book_url).path)[1:]
+            data['book_path'] = 'Не скачивалась' if args.skip_txt else download_txt(DOWNLOAD_URL, book_id, data['Название'], folder=args.dest_folder_txt)
+
+            data_books.append(data)
         except requests.HTTPError:
             print('Такой книги нет!')
 

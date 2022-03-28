@@ -29,10 +29,6 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def get_book_id(url):
-    return sanitize_filename(urlsplit(url).path)[1:]
-
-
 def parse_book_urls(start_page, end_page):
     books_url = []
     for page in range(start_page, end_page + 1):
@@ -123,7 +119,8 @@ def parse_book_page(
 
     img_src = 'Не скачивалась' if skip_imgs else download_image(image_url, folder=dest_folder_img)
 
-    book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, get_book_id(book_url), title, folder=dest_folder_txt)
+    book_id = sanitize_filename(urlsplit(book_url).path)[1:]
+    book_path = 'Не скачивалась' if skip_txt else download_txt(DOWNLOAD_URL, book_id, title, folder=dest_folder_txt)
 
     data_page = {
         'Название': title,

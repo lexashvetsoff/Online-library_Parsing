@@ -24,18 +24,35 @@ def on_reload():
 
     template = env.get_template('template.html')
 
-    if len(data_books) % 2 != 0:
-        books = list(chunked(data_books, len(data_books) - 1))
+    d_books = list(chunked(data_books, 20))
+    
+    for page_number, books in enumerate(d_books, 1):
+        file_name = f'index{page_number}.html'
+        folder = 'pages'
+        
+        if not os.path.exists(folder):
+            os.makedirs(folder, exist_ok=True)
+
         rendered_page = template.render(
-            books = books[0]
-        )
-    else:
-        rendered_page = template.render(
-            books = data_books
+            books = books
         )
 
-    with open('index.html', 'w', encoding="utf8") as file:
-        file.write(rendered_page)
+        file_path = os.path.join(folder, file_name)
+        with open(file_path, 'w', encoding="utf8") as file:
+            file.write(rendered_page)
+
+    # if len(data_books) % 2 != 0:
+    #     books = list(chunked(data_books, len(data_books) - 1))
+    #     rendered_page = template.render(
+    #         books = books[0]
+    #     )
+    # else:
+    #     rendered_page = template.render(
+    #         books = data_books
+    #     )
+
+    # with open('index.html', 'w', encoding="utf8") as file:
+    #     file.write(rendered_page)
 
 on_reload()
 

@@ -1,6 +1,7 @@
 from livereload import Server
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from more_itertools import chunked
+from urllib.parse import urlencode, quote
 import json
 import os
 
@@ -12,6 +13,7 @@ if os.sep == '\\':
     for book in data_books:
         book['img_src'] = book['img_src'].replace('\\', '/')
         book['book_path'] = book['book_path'].replace('\\', '/')
+        book['book_path'] = quote(book['book_path'])
 
 
 def on_reload():

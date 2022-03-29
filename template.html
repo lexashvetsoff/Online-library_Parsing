@@ -8,6 +8,42 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
+  <div class="container mt-3">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        {% set next = current_page + 1 %}
+        {% set prev = current_page - 1 %}
+        {% if current_page == 1 %}
+          <li class="page-item disabled">
+            <a class="page-link" href="/pages/index{{ current_page }}.html" tabindex="-1" aria-disabled="true">Prev</a>
+          </li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="/pages/index{{ prev }}.html">Prev</a></li>
+        {% endif %}
+
+        {% for page in range(1, all_pages + 1) %}
+          {% if page == current_page %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="/pages/index{{ page }}.html">{{ page }}</a>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="/pages/index{{ page }}.html">{{ page }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if current_page == all_pages %}
+          <li class="page-item disabled">
+            <a class="page-link" href="/pages/index{{ current_page }}.html" tabindex="-1" aria-disabled="true">Next</a>
+          </li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="/pages/index{{ next }}.html">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
   <div class="container">
     <div class="row">
     {% for book in books %}

@@ -1,7 +1,6 @@
-# from http.server import HTTPServer, SimpleHTTPRequestHandler
 from livereload import Server
-
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from more_itertools import chunked
 import json
 import os
 
@@ -14,6 +13,7 @@ if os.sep == '\\':
         book['img_src'] = book['img_src'].replace('\\', '/')
         book['book_path'] = book['book_path'].replace('\\', '/')
 
+
 def on_reload():
     env = Environment(
         loader=FileSystemLoader('.'),
@@ -21,10 +21,16 @@ def on_reload():
     )
 
     template = env.get_template('template.html')
-    
-    rendered_page = template.render(
-        books = data_books
-    )
+
+    if len(data_books) % 2 != 0:
+        books = list(chunked(data_books, len(data_books) - 1))
+        rendered_page = template.render(
+            books = books[0]
+        )
+    else:
+        rendered_page = template.render(
+            books = data_books
+        )
 
     with open('index.html', 'w', encoding="utf8") as file:
         file.write(rendered_page)
@@ -35,6 +41,3 @@ server = Server()
 
 server.watch('template.html', on_reload)
 server.serve(root='.')
-
-# server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-# server.serve_forever()

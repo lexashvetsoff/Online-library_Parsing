@@ -2,6 +2,10 @@
 
 Скрипт скачивает книги с сайта tululu.org.
 
+### Где посмотреть
+
+Пример сайта можно увидеть по [ссылке](https://lexashvetsoff.github.io/Online-library_Parsing/pages/index1.html).
+
 ### Как установить
 
 Для запуска блога у вас уже должен быть установлен Python 3.

@@ -21,14 +21,14 @@ def on_reload(books):
         file_name = f'index{page_number}.html'
         folder = 'pages'
 
-        all_pages = math.ceil(len(books) / 20)
+        pagination = math.ceil(len(books) / 20)
         
         if not os.path.exists(folder):
             os.makedirs(folder, exist_ok=True)
 
         rendered_page = template.render(
             books = books,
-            all_pages = all_pages,
+            pagination = pagination,
             current_page = page_number
         )
 

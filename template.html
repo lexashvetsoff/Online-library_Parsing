@@ -22,7 +22,7 @@
           <li class="page-item"><a class="page-link" href="/Online-library_Parsing/pages/index{{ prev }}.html">Prev</a></li>
         {% endif %}
 
-        {% for page in range(1, all_pages + 1) %}
+        {% for page in range(1, pagination + 1) %}
           {% if page == current_page %}
             <li class="page-item active" aria-current="page">
               <a class="page-link" href="/Online-library_Parsing/pages/index{{ page }}.html">{{ page }}</a>
@@ -34,7 +34,7 @@
           {% endif %}
         {% endfor %}
 
-        {% if current_page == all_pages %}
+        {% if current_page == pagination %}
           <li class="page-item disabled">
             <a class="page-link" href="/Online-library_Parsing/pages/index{{ current_page }}.html" tabindex="-1" aria-disabled="true">Next</a>
           </li>

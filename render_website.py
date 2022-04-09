@@ -6,6 +6,8 @@ import json
 import math
 import os
 
+FOLDER = 'pages'
+
 
 def on_reload(books):
     env = Environment(
@@ -16,15 +18,13 @@ def on_reload(books):
     template = env.get_template('template.html')
 
     paginated_books = list(chunked(books, 20))
+
+    os.makedirs(FOLDER, exist_ok=True)
     
     for page_number, books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
-        folder = 'pages'
 
         pagination = math.ceil(len(books) / 20)
-        
-        if not os.path.exists(folder):
-            os.makedirs(folder, exist_ok=True)
 
         rendered_page = template.render(
             books = books,
@@ -32,7 +32,7 @@ def on_reload(books):
             current_page = page_number
         )
 
-        file_path = os.path.join(folder, file_name)
+        file_path = os.path.join(FOLDER, file_name)
         with open(file_path, 'w', encoding="utf8") as file:
             file.write(rendered_page)
 

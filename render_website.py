@@ -45,18 +45,6 @@ def on_reload():
         with open(file_path, 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
-    # if len(books_data) % 2 != 0:
-    #     books = list(chunked(books_data, len(books_data) - 1))
-    #     rendered_page = template.render(
-    #         books = books[0]
-    #     )
-    # else:
-    #     rendered_page = template.render(
-    #         books = books_data
-    #     )
-
-    # with open('index.html', 'w', encoding="utf8") as file:
-    #     file.write(rendered_page)
 
 on_reload()
 

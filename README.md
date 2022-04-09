@@ -1,6 +1,6 @@
 # Парсер книг с сайта tululu.org
 
-Скрипт скачивает книги с сайта tululu.org.
+Скрипт скачивает книги с сайта tululu.org и создает веб-сайт с ними.
 
 ### Где посмотреть
 
@@ -12,6 +12,9 @@
 Установите зависимости командой `pip install -r requirements.txt`
 
 ### Аргументы
+
+#### parse_tululu_category.py
+Скрипт скачивает книги с [tululu.org](tululu.org) и собирает информацию по ним.  
 
 У скрипта есть параметры:  
      `--start_page` - по умолчанию = 1 - начальная страница скачивания  
@@ -32,6 +35,13 @@ python parse_tululu_category.py --start_page=10 --end_page=11
 python parse_tululu_category.py
 ```
 Скачаются книги со всех страниц, картинки будут хранится в папке images, книги - books, корне каталога создастся файл data_books.json с данными по скачанным книгам.
+
+#### render_website.py
+Формирует веб сайт из данных полученных скриптом `parse_tululu_category.py`.  
+Для запуска введите команду:  
+```
+python render_website.py
+```
 
 ### Цель проекта
 

@@ -7,7 +7,7 @@ import math
 import os
 
 
-def on_reload(books_data):
+def on_reload(books):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -15,13 +15,13 @@ def on_reload(books_data):
 
     template = env.get_template('template.html')
 
-    paginated_books = list(chunked(books_data, 20))
+    paginated_books = list(chunked(books, 20))
     
     for page_number, books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
         folder = 'pages'
 
-        all_pages = math.ceil(len(books_data) / 20)
+        all_pages = math.ceil(len(books) / 20)
         
         if not os.path.exists(folder):
             os.makedirs(folder, exist_ok=True)
@@ -38,16 +38,16 @@ def on_reload(books_data):
 
 
 def main():
-    with open('books_data.json', 'r', encoding="utf8") as file:
-        books_data = json.load(file)
+    with open('books.json', 'r', encoding="utf8") as file:
+        books = json.load(file)
 
     if os.sep == '\\':
-        for book in books_data:
+        for book in books:
             book['img_src'] = book['img_src'].replace('\\', '/')
             book['book_path'] = book['book_path'].replace('\\', '/')
             book['book_path'] = quote(book['book_path'])
     
-    on_reload(books_data)
+    on_reload(books)
 
     server = Server()
 

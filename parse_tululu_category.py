@@ -30,7 +30,7 @@ def create_parser():
     parser.add_argument('--dest_folder_txt', default='books/', type=str)
     parser.add_argument('--skip_imgs', default=False, type=bool)
     parser.add_argument('--skip_txt', default=False, type=bool)
-    parser.add_argument('--json_path', default='books_data.json', type=str)
+    parser.add_argument('--json_path', default='books.json', type=str)
 
     return parser
 
@@ -123,37 +123,37 @@ def parse_book_page(book_url):
     book_image = soup.select_one(img_selector)
     image_url = urljoin(BASE_URL, book_image['src'])
 
-    data_page = {
+    page = {
         'Название': title.strip(),
         'Автор': author.strip(),
         'Жанр': genres,
         'Коментарии': comments,
         'image_url': image_url
     }
-    return data_page
+    return page
 
 
 def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    books_data = []
+    books = []
     book_urls = parse_book_urls(args.start_page, args.end_page)
 
     for book_url in book_urls:
         try:
-            data = parse_book_page(book_url)
+            page = parse_book_page(book_url)
 
-            data['img_src'] = 'Не скачивалась' if args.skip_imgs else download_image(data['image_url'], folder=args.dest_folder_img)
+            page['img_src'] = 'Не скачивалась' if args.skip_imgs else download_image(page['image_url'], folder=args.dest_folder_img)
             book_id = sanitize_filename(urlsplit(book_url).path)[1:]
-            data['book_path'] = 'Не скачивалась' if args.skip_txt else download_txt(DOWNLOAD_URL, book_id, data['Название'], folder=args.dest_folder_txt)
+            page['book_path'] = 'Не скачивалась' if args.skip_txt else download_txt(DOWNLOAD_URL, book_id, page['Название'], folder=args.dest_folder_txt)
 
-            books_data.append(data)
+            books.append(page)
         except requests.HTTPError:
             print('Такой книги нет!')
 
     with open(args.json_path, 'w', encoding='utf8') as file:
-        json.dump(books_data, file, ensure_ascii=False)
+        json.dump(books, file, ensure_ascii=False)
 
 
 if __name__ == '__main__':

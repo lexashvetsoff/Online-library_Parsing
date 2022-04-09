@@ -4,7 +4,7 @@
 
 ### Где посмотреть
 
-Пример сайта можно увидеть по [ссылке](https://lexashvetsoff.github.io/Online-library_Parsing/pages/index1.html).
+Пример сайта можно увидеть посмотреть здесь - [онлайн библиотека](https://lexashvetsoff.github.io/Online-library_Parsing/pages/index1.html).
 
 ### Как установить
 

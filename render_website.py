@@ -20,16 +20,16 @@ def on_reload(books):
     paginated_books = list(chunked(books, 20))
 
     os.makedirs(FOLDER, exist_ok=True)
-    
+
     for page_number, books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
 
         pagination = math.ceil(len(books) / 20)
 
         rendered_page = template.render(
-            books = books,
-            pagination = pagination,
-            current_page = page_number
+            books=books,
+            pagination=pagination,
+            current_page=page_number
         )
 
         file_path = os.path.join(FOLDER, file_name)
@@ -46,7 +46,7 @@ def main():
             book['img_src'] = book['img_src'].replace('\\', '/')
             book['book_path'] = book['book_path'].replace('\\', '/')
             book['book_path'] = quote(book['book_path'])
-    
+
     on_reload(books)
 
     server = Server()

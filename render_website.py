@@ -15,9 +15,9 @@ def on_reload(books_data):
 
     template = env.get_template('template.html')
 
-    d_books = list(chunked(books_data, 20))
+    paginated_books = list(chunked(books_data, 20))
     
-    for page_number, books in enumerate(d_books, 1):
+    for page_number, books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
         folder = 'pages'
 

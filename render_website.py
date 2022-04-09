@@ -7,8 +7,7 @@ import math
 import os
 
 with open('books_data.json', 'r', encoding="utf8") as file:
-    books_data_json = file.read()
-books_data = json.loads(books_data_json)
+    books_data = json.load(file)
 
 if os.sep == '\\':
     for book in books_data:

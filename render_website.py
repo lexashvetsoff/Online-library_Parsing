@@ -21,13 +21,13 @@ def on_reload(books):
 
     os.makedirs(FOLDER, exist_ok=True)
 
-    for page_number, books in enumerate(paginated_books, 1):
+    for page_number, page_books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
 
         pagination = math.ceil(len(books) / 20)
 
         rendered_page = template.render(
-            books=books,
+            books=page_books,
             pagination=pagination,
             current_page=page_number
         )

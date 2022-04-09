@@ -6,17 +6,8 @@ import json
 import math
 import os
 
-with open('books_data.json', 'r', encoding="utf8") as file:
-    books_data = json.load(file)
 
-if os.sep == '\\':
-    for book in books_data:
-        book['img_src'] = book['img_src'].replace('\\', '/')
-        book['book_path'] = book['book_path'].replace('\\', '/')
-        book['book_path'] = quote(book['book_path'])
-
-
-def on_reload():
+def on_reload(books_data):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -46,9 +37,23 @@ def on_reload():
             file.write(rendered_page)
 
 
-on_reload()
+def main():
+    with open('books_data.json', 'r', encoding="utf8") as file:
+        books_data = json.load(file)
 
-server = Server()
+    if os.sep == '\\':
+        for book in books_data:
+            book['img_src'] = book['img_src'].replace('\\', '/')
+            book['book_path'] = book['book_path'].replace('\\', '/')
+            book['book_path'] = quote(book['book_path'])
+    
+    on_reload(books_data)
 
-server.watch('template.html', on_reload)
-server.serve(root='.')
+    server = Server()
+
+    server.watch('template.html', on_reload)
+    server.serve(root='.')
+
+
+if __name__ == '__main__':
+    main()

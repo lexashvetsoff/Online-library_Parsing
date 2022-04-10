@@ -7,6 +7,7 @@ import math
 import os
 
 FOLDER = 'pages'
+BOOKS_ON_PAGE = 20
 
 
 def on_reload(books):
@@ -17,14 +18,14 @@ def on_reload(books):
 
     template = env.get_template('template.html')
 
-    paginated_books = list(chunked(books, 20))
+    paginated_books = list(chunked(books, BOOKS_ON_PAGE))
 
     os.makedirs(FOLDER, exist_ok=True)
 
     for page_number, page_books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
 
-        pagination = math.ceil(len(books) / 20)
+        pagination = math.ceil(len(books) / BOOKS_ON_PAGE)
 
         rendered_page = template.render(
             books=page_books,

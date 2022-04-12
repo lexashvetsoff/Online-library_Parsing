@@ -6,7 +6,7 @@ import json
 import math
 import os
 
-NAME_FOLDER = 'pages'
+HTML_PAGES_FOLDER_NAME = 'pages'
 BOOKS_ON_PAGE = 20
 
 
@@ -20,7 +20,7 @@ def on_reload(books):
 
     paginated_books = list(chunked(books, BOOKS_ON_PAGE))
 
-    os.makedirs(NAME_FOLDER, exist_ok=True)
+    os.makedirs(HTML_PAGES_FOLDER_NAME, exist_ok=True)
 
     for page_number, page_books in enumerate(paginated_books, 1):
         file_name = f'index{page_number}.html'
@@ -33,7 +33,7 @@ def on_reload(books):
             current_page=page_number
         )
 
-        file_path = os.path.join(NAME_FOLDER, file_name)
+        file_path = os.path.join(HTML_PAGES_FOLDER_NAME, file_name)
         with open(file_path, 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
